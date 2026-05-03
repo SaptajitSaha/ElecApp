@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Send, CheckCircle, AlertTriangle, ShieldCheck, HelpCircle, Layers } from 'lucide-react';
 import { analyzeIntent, getContextualSuggestions } from './intentEngine';
+import { QuizMode, FlashcardsMode } from './LearningMode';
 import './Assistant.css';
 
 const SetupFlow = ({ onComplete }) => {
+  // ... (keep existing SetupFlow as is, I will replace the main component)
   const [step, setStep] = useState(0);
   const [state, setState] = useState({
     isEligible: false,
@@ -72,6 +74,7 @@ const ElectionAssistant = () => {
   const [userState, setUserState] = useState(null); // null means needs setup
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [activeMode, setActiveMode] = useState(null); // 'quiz' or 'flashcards'
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -132,6 +135,9 @@ const ElectionAssistant = () => {
 
   return (
     <div className="assistant-container">
+      {activeMode === 'quiz' && <QuizMode onClose={() => setActiveMode(null)} />}
+      {activeMode === 'flashcards' && <FlashcardsMode onClose={() => setActiveMode(null)} />}
+
       <header className="assistant-header">
         <div className="header-title">
           <h1>CivicFlow AI</h1>
@@ -193,6 +199,14 @@ const ElectionAssistant = () => {
       </main>
 
       <footer className="input-area">
+        <div className="learning-triggers" style={{display: 'flex', gap: '1rem', marginBottom: '1rem'}}>
+          <button className="suggestion-chip" style={{borderColor: '#10b981', color: '#10b981'}} onClick={() => setActiveMode('quiz')}>
+            <HelpCircle size={14} style={{display:'inline', marginBottom:'-2px', marginRight:'4px'}}/> Take a Quiz
+          </button>
+          <button className="suggestion-chip" style={{borderColor: '#8b5cf6', color: '#8b5cf6'}} onClick={() => setActiveMode('flashcards')}>
+            <Layers size={14} style={{display:'inline', marginBottom:'-2px', marginRight:'4px'}}/> View Flashcards
+          </button>
+        </div>
         <div className="suggestions">
           {suggestions.map((sug, idx) => (
             <button 
